@@ -90,7 +90,7 @@ public class Play {
 		lblComputerAttaksThis.setText("computer hits this side");
 
 		Label lblYouAttackThis = new Label(shlplay, SWT.NONE);
-		lblYouAttackThis.setText("please choose 1 field to hit");
+		lblYouAttackThis.setText("please choose max. 5 fields to hit");
 		lblYouAttackThis.setBounds(647, 16, 227, 15);
 
 		// paint hthe players checkboxes
@@ -147,6 +147,8 @@ public class Play {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
+				boolean mtone = false;
+
 				int active = 0;
 
 				for (int i = 0; i < 10; i++) {
@@ -157,41 +159,93 @@ public class Play {
 					}
 				}
 
-				if (active != 1) {
-					MsgBox("Warning", "Please choose only one field");
+				if (active > 5) {
+					MsgBox("Warning", "Please choose max. 5 fields");
+					mtone = true;
 				} else {
 
-					int a = 0;
-					int b = 0;
-					
-					// gets the position in the array of the choosen field
-					for (int i = 0; i < 10; i++) {
-						for (int j = 0; j < 10; j++) {
-							if (playerhit[i][j].getSelection() && playerhit[i][j].getVisible()) {
-								a = i;
-								b = j;
+					for (int p = 0; p < active; p++) {
+						int a = 0;
+						int b = 0;
+
+						// gets the position in the array of the choosen field
+						for (int i = 0; i < 10; i++) {
+							for (int j = 0; j < 10; j++) {
+								if (playerhit[i][j].getSelection() && playerhit[i][j].getVisible()) {
+									a = i;
+									b = j;
+								}
 							}
+						}
+
+						if (computerset[a][b].getSelection() && playerhit[a][b].getVisible()) {
+							// if the chosen field was correct
+							playerhit[a][b].setVisible(false);
+							int posx = 450 + 75 + (a * 30);
+							int posy = 75 + (b * 30);
+							setCanvasgreen(posx, posy, 13, 13);
+							phit++;
+						} else {
+							playerhit[a][b].setVisible(false);
+							int posx = 450 + 75 + (a * 30);
+							int posy = 75 + (b * 30);
+							setCanvasred(posx, posy, 13, 13);
 						}
 					}
 
-					if (computerset[a][b].getSelection() &&  playerhit[a][b].getVisible()) {
-						// if the chosen field was correct
-						playerhit[a][b].setVisible(false);
-						int posx = 450 + 75 + (a * 30);
-						int posy = 75 + (b * 30);
-						setCanvasgreen(posx, posy, 13, 13);
-						phit++;
-						System.out.println("hit");
-					} else {
-						playerhit[a][b].setVisible(false);
-						int posx = 450 + 75 + (a * 30);
-						int posy = 75 + (b * 30);
-						setCanvasred(posx, posy, 13, 13);
-						System.out.println("didnt hit");
-					}
-
 				}
+				// end playerpart
 
+				if (!mtone) {
+					// start computerpart
+
+					for (int i = 0; i < active; i++) {
+
+						Random rnd = new Random();
+
+						boolean frei = true;
+
+						int x = 0;
+						int y = 0;
+
+						while (frei) {
+
+							int a = rnd.nextInt(10);
+							int b = rnd.nextInt(10);
+
+							if (Choose.playerset[a][b].getVisible()) {
+								x = a;
+								y = b;
+								frei = false;
+							}
+
+						}
+
+						if (Choose.playerset[x][y].getSelection() && Choose.playerset[x][y].getVisible()) {
+							// if the computer hit the players box
+							Choose.playerset[x][y].setVisible(false);
+							int posx = 75 + (x * 30);
+							int posy = 75 + (y * 30);
+							setCanvasgreen(posx, posy, 13, 13);
+							pchit++;
+
+						} else {
+							// if the computer didnt hit the playersbox
+							Choose.playerset[x][y].setVisible(false);
+							int posx = 75 + (x * 30);
+							int posy = 75 + (y * 30);
+							setCanvasred(posx, posy, 13, 13);
+						}
+					}
+				}
+				
+				if(pchit==10 && phit <10){
+					MsgBox("LOSS!", "You have lost the game!");
+				}else if(pchit <10 && phit ==10){
+					MsgBox("WON!", "You have won the game!");
+				}else if(pchit == 10 && phit ==10){
+					MsgBox("DRAW!", "It's a draw!");
+				}
 			}
 		});
 		btnhit.setBounds(799, 376, 75, 25);
