@@ -12,6 +12,10 @@ import org.eclipse.swt.events.SelectionEvent;
 
 public class Choose {
 
+	int q=0;
+	int i=0;
+	int j=0;
+	
 	protected static Shell shlchoose;
 
 	public static void startgui() {
@@ -69,7 +73,7 @@ public class Choose {
 		lblChooseBoxes.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		lblChooseBoxes.setBounds(10, 10, 123, 21);
 		lblChooseBoxes.setText("Choose 10 Boxes!");
-
+		q=0;
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				int abstandtop = 75;
@@ -79,6 +83,19 @@ public class Choose {
 
 				playerset[i][j] = new Button(shlchoose, SWT.CHECK);
 				playerset[i][j].setBounds(x, y, 13, 13);
+				
+				
+				playerset[i][j].addSelectionListener(new SelectionAdapter()
+				{
+				    @Override
+				    public void widgetSelected(SelectionEvent e)
+				    {
+				        Button button = (Button) e.widget;
+				        if (button.getSelection())
+				            q++;
+				        lblangeklickt.setText(""+q);
+				    }
+				});
 
 			}
 		}
