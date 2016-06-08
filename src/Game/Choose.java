@@ -1,23 +1,28 @@
 package Game;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.SWT;
-import org.eclipse.wb.swt.SWTResourceManager;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 public class Choose {
 
-	int q=0;
-	int i=0;
-	int j=0;
-	
+	int q = 0;
+	int i = 0;
+	int j = 0;
+
 	protected static Shell shlchoose;
 
+	
+	/**
+	 * @wbp.parser.entryPoint
+	 */
+	
 	public static void startgui() {
 		try {
 			Choose window = new Choose();
@@ -32,14 +37,6 @@ public class Choose {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		try {
-			Choose window = new Choose();
-			window.open();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Open the window.
@@ -62,18 +59,21 @@ public class Choose {
 	public static Button[][] playerset = new Button[10][10];
 
 	protected void createContents() {
-		shlchoose = new Shell();
+		shlchoose = new Shell(SWT.CLOSE | SWT.MIN);
+		shlchoose.setImage(SWTResourceManager.getImage("C:\\Users\\FlavioMueller\\git\\Hitit\\src\\hitit.png"));
 		shlchoose.setSize(450, 449);
 		shlchoose.setText("SWT Application");
 
 		Label lblangeklickt = new Label(shlchoose, SWT.NONE);
-		lblangeklickt.setBounds(62, 385, 55, 15);
+		lblangeklickt.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblangeklickt.setBounds(71, 375, 55, 25);
 
 		Label lblChooseBoxes = new Label(shlchoose, SWT.NONE);
+		lblChooseBoxes.setImage(null);
 		lblChooseBoxes.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		lblChooseBoxes.setBounds(10, 10, 123, 21);
-		lblChooseBoxes.setText("Choose 10 Boxes!");
-		q=0;
+		lblChooseBoxes.setText("Choose 10 boxes!");
+		q = 0;
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				int abstandtop = 75;
@@ -83,23 +83,24 @@ public class Choose {
 
 				playerset[i][j] = new Button(shlchoose, SWT.CHECK);
 				playerset[i][j].setBounds(x, y, 13, 13);
-				
-				
-				playerset[i][j].addSelectionListener(new SelectionAdapter()
-				{
-				    @Override
-				    public void widgetSelected(SelectionEvent e)
-				    {
-				        Button button = (Button) e.widget;
-				        if (button.getSelection())
-				            q++;
-				        lblangeklickt.setText(""+q);
-				    }
+
+				playerset[i][j].addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						Button button = (Button) e.widget;
+						if (button.getSelection()) {
+							q++;
+							lblangeklickt.setText("" + q);
+						} else {
+							q--;
+							lblangeklickt.setText("" + q);
+						}
+					}
 				});
 
 			}
 		}
-
+		
 		Label line = new Label(shlchoose, SWT.SEPARATOR | SWT.HORIZONTAL);
 		line.setBounds(10, 37, 414, 2);
 
@@ -125,6 +126,7 @@ public class Choose {
 					msgBox.open();
 				} else {
 					shlchoose.setVisible(false);
+					Main.windows.add(shlchoose);
 					Play.startgui();
 				}
 
@@ -134,7 +136,8 @@ public class Choose {
 		btnsave.setText("Save");
 
 		Label lblChosen = new Label(shlchoose, SWT.NONE);
-		lblChosen.setBounds(10, 385, 41, 15);
+		lblChosen.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
+		lblChosen.setBounds(10, 375, 55, 25);
 		lblChosen.setText("chosen:");
 	}
 }
