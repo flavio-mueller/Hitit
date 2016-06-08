@@ -1,5 +1,12 @@
 package Game;
 
+import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,14 +22,15 @@ public class Choose {
 	int q = 0;
 	int i = 0;
 	int j = 0;
+	Timer t;
+	boolean isvisible = true;
 
 	protected static Shell shlchoose;
 
-	
 	/**
 	 * @wbp.parser.entryPoint
 	 */
-	
+
 	public static void startgui() {
 		try {
 			Choose window = new Choose();
@@ -59,6 +67,33 @@ public class Choose {
 	public static Button[][] playerset = new Button[10][10];
 
 	protected void createContents() {
+
+		t = new Timer();
+		t.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				play("src/choose.wav");
+			}
+
+			public void play(String filename) {
+				try {
+					Clip clip = AudioSystem.getClip();
+					clip.open(AudioSystem.getAudioInputStream(new File(filename)));
+					clip.start();
+					Thread.sleep(500);
+					while (clip.isRunning() && isvisible) {
+						Thread.sleep(1000);
+					}
+					clip.stop();
+					clip.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+		}, 0, 305_000);
+
 		shlchoose = new Shell(SWT.CLOSE | SWT.MIN);
 		shlchoose.setImage(SWTResourceManager.getImage("C:\\Users\\FlavioMueller\\git\\Hitit\\src\\hitit.png"));
 		shlchoose.setSize(450, 449);
@@ -91,8 +126,27 @@ public class Choose {
 						if (button.getSelection()) {
 							q++;
 							lblangeklickt.setText("" + q);
+							if (q == 10) {
+
+								for (int i = 0; i < 10; i++) {
+									for (int j = 0; j < 10; j++) {
+										if (!playerset[i][j].getSelection()) {
+											playerset[i][j].setEnabled(false);
+										}
+									}
+								}
+
+							}
+
 						} else {
 							q--;
+							for (int i = 0; i < 10; i++) {
+								for (int j = 0; j < 10; j++) {
+									if (!playerset[i][j].getSelection()) {
+										playerset[i][j].setEnabled(true);
+									}
+								}
+							}
 							lblangeklickt.setText("" + q);
 						}
 					}
@@ -100,7 +154,7 @@ public class Choose {
 
 			}
 		}
-		
+
 		Label line = new Label(shlchoose, SWT.SEPARATOR | SWT.HORIZONTAL);
 		line.setBounds(10, 37, 414, 2);
 
@@ -120,11 +174,13 @@ public class Choose {
 				}
 
 				if (chosen != 10) {
+					Play.playsound("confirm.stargui");
 					MessageBox msgBox = new MessageBox(shlchoose);
 					msgBox.setText("Warning!");
 					msgBox.setMessage("Please choose 10 Boxes!");
 					msgBox.open();
 				} else {
+					isvisible = false;
 					shlchoose.setVisible(false);
 					Main.windows.add(shlchoose);
 					Play.startgui();

@@ -5,18 +5,15 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.Line;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Label;
@@ -29,10 +26,11 @@ public class Play {
 	int q = 0;
 
 	protected static Shell shlplay;
-	
+
 	Timer t;
 	int pchit = 0;
 	int phit = 0;
+	boolean isvisible = true;
 
 	/**
 	 * Launch the application.
@@ -67,6 +65,7 @@ public class Play {
 			}
 		}
 		t.cancel();
+		isvisible = false;
 	}
 
 	/**
@@ -75,14 +74,30 @@ public class Play {
 	protected void createContents() {
 
 		t = new Timer();
-		t.schedule(new TimerTask(){
+		t.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				repeatsound("ingame.wav");
+				play("src/ingame.wav");
 			}
-			
-		},0, 20_000);
+
+			public void play(String filename) {
+				try {
+					Clip clip = AudioSystem.getClip();
+					clip.open(AudioSystem.getAudioInputStream(new File(filename)));
+					clip.start();
+					Thread.sleep(500);
+					while (clip.isRunning() && isvisible) {
+						Thread.sleep(1000);
+					}
+					clip.stop();
+					clip.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+		}, 0, 305_000);
 
 		shlplay = new Shell(SWT.CLOSE | SWT.MIN);
 		shlplay.setImage(SWTResourceManager.getImage("C:\\Users\\FlavioMueller\\git\\Hitit\\src\\hitit.png"));
@@ -94,6 +109,16 @@ public class Play {
 		lblYourField.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		lblYourField.setBounds(10, 10, 66, 21);
 		lblYourField.setText("Your field");
+
+		Label pntcomp = new Label(shlplay, SWT.NONE);
+		pntcomp.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.NORMAL));
+		pntcomp.setBounds(434, 51, 10, 21);
+		pntcomp.setText("0");
+
+		Label pntplay = new Label(shlplay, SWT.NONE);
+		pntplay.setText("0");
+		pntplay.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.NORMAL));
+		pntplay.setBounds(458, 51, 10, 21);
 
 		Label label = new Label(shlplay, SWT.SEPARATOR | SWT.HORIZONTAL);
 		label.setBounds(10, 37, 864, 2);
@@ -147,8 +172,26 @@ public class Play {
 						if (button.getSelection()) {
 							q++;
 							lblgewählt.setText(" " + q);
+
+							if (q == 5) {
+								for (int i = 0; i < 10; i++) {
+									for (int j = 0; j < 10; j++) {
+										if (!playerhit[i][j].getSelection()) {
+											playerhit[i][j].setEnabled(false);
+										}
+									}
+								}
+							}
+
 						} else {
 							q--;
+							for (int i = 0; i < 10; i++) {
+								for (int j = 0; j < 10; j++) {
+									if (!playerhit[i][j].getSelection()) {
+										playerhit[i][j].setEnabled(true);
+									}
+								}
+							}
 							lblgewählt.setText(" " + q);
 						}
 					}
@@ -183,10 +226,8 @@ public class Play {
 		btnhit.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-
-				playsound("hit.wav");
-
 				q = 0;
+
 				lblgewählt.setText(" " + q);
 				boolean mtone = false;
 
@@ -203,8 +244,28 @@ public class Play {
 				if (active > 5) {
 					MsgBox("Warning", "Please choose max. 5 fields");
 					mtone = true;
-					q = 5;
+
+					int ausgewählt = 0;
+					for (int i = 0; i < 10; i++) {
+						for (int j = 0; j < 10; j++) {
+							if (playerhit[i][j].getSelection() && playerhit[i][j].getVisible()) {
+								ausgewählt++;
+							}
+						}
+					}
+					q = ausgewählt;
+
 				} else {
+
+					for (int i = 0; i < 10; i++) {
+						for (int j = 0; j < 10; j++) {
+							if (!playerhit[i][j].getSelection()) {
+								playerhit[i][j].setEnabled(true);
+							}
+						}
+					}
+					
+					playsound("hit.wav");
 
 					for (int p = 0; p < active; p++) {
 						int a = 0;
@@ -281,15 +342,21 @@ public class Play {
 					}
 				}
 
+				pntcomp.setText(Integer.toString(pchit));
+				pntplay.setText(Integer.toString(phit));
+
 				if (pchit == 10 && phit < 10) {
+					isvisible = false;
 					shlplay.setVisible(false);
 					Main.windows.add(shlplay);
 					Loss.startgui();
 				} else if (pchit < 10 && phit == 10) {
+					isvisible = false;
 					shlplay.setVisible(false);
 					Main.windows.add(shlplay);
 					Won.startgui();
 				} else if (pchit == 10 && phit == 10) {
+					isvisible = false;
 					shlplay.setVisible(false);
 					Main.windows.add(shlplay);
 					Draw.startgui();
@@ -338,34 +405,6 @@ public class Play {
 					e.printStackTrace();
 				}
 			}
-		}).start();
-	}
-
-	public static synchronized void repeatsound(String path) {
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					Clip clip = AudioSystem.getClip();
-					URL url = this.getClass().getClassLoader().getResource(path);
-					AudioInputStream inputStream = AudioSystem.getAudioInputStream(url);
-					clip.open(inputStream);
-					clip.start();
-					AudioFormat af = inputStream.getFormat();
-
-					DataLine.Info info = new DataLine.Info(Clip.class, af);
-
-					Line line1 = AudioSystem.getLine(info);
-
-					if (!line1.isOpen()) {
-						clip.open(inputStream);
-						clip.loop(Clip.LOOP_CONTINUOUSLY);
-						clip.start();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
 		}).start();
 	}
 }
