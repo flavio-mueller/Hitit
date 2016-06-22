@@ -52,9 +52,9 @@ public class Loss {
 	 */
 	protected void createContents() {
 		shlloss = new Shell(SWT.CLOSE| SWT.MIN);
-		shlloss.setImage(SWTResourceManager.getImage("C:\\Users\\FlavioMueller\\git\\Hitit\\src\\hitit.png"));
+		shlloss.setImage(SWTResourceManager.getImage(Loss.class, "/img/hitit.png"));
 		shlloss.setSize(450, 300);
-		shlloss.setText("SWT Application");
+		shlloss.setText("Hitit");
 
 		Button button = new Button(shlloss, SWT.NONE);
 		button.addSelectionListener(new SelectionAdapter() {
@@ -66,7 +66,7 @@ public class Loss {
 		button.setText("Close!");
 		button.setBounds(349, 226, 75, 25);
 		
-		Play.playsound("loss.wav");
+		Play.playsound("res/loss.wav");
 
 		Button button_1 = new Button(shlloss, SWT.NONE);
 		button_1.addSelectionListener(new SelectionAdapter() {
@@ -79,10 +79,6 @@ public class Loss {
 		});
 		button_1.setText("Try it again!");
 		button_1.setBounds(268, 226, 75, 25);
-
-		Button button_2 = new Button(shlloss, SWT.NONE);
-		button_2.setText("Back to the selection!");
-		button_2.setBounds(140, 226, 124, 25);
 
 		Label lblTheComputerHas = new Label(shlloss, SWT.NONE);
 		lblTheComputerHas.setText("The computer has won!");

@@ -52,19 +52,16 @@ public class Draw {
 	 */
 	protected void createContents() {
 		shldraw = new Shell();
+		shldraw.setImage(SWTResourceManager.getImage(Draw.class, "/img/hitit.png"));
 		shldraw.setSize(450, 300);
-		shldraw.setText("SWT Application");
+		shldraw.setText("Hitit");
 		
-		Play.playsound("draw.wav");
+		Play.playsound("res/draw.wav");
 
 		Label lblItsADraw = new Label(shldraw, SWT.NONE);
 		lblItsADraw.setText("It's a draw!");
 		lblItsADraw.setFont(SWTResourceManager.getFont("Segoe UI", 27, SWT.NORMAL));
 		lblItsADraw.setBounds(10, 10, 414, 75);
-
-		Button button = new Button(shldraw, SWT.NONE);
-		button.setText("Back to the selection!");
-		button.setBounds(140, 226, 124, 25);
 
 		Button button_1 = new Button(shldraw, SWT.NONE);
 		button_1.addSelectionListener(new SelectionAdapter() {

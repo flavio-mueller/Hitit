@@ -16,6 +16,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 
 public class Choose {
 
@@ -73,7 +75,7 @@ public class Choose {
 
 			@Override
 			public void run() {
-				play("src/choose.wav");
+				play("res/choose.wav");
 			}
 
 			public void play(String filename) {
@@ -95,9 +97,15 @@ public class Choose {
 		}, 0, 305_000);
 
 		shlchoose = new Shell(SWT.CLOSE | SWT.MIN);
-		shlchoose.setImage(SWTResourceManager.getImage("C:\\Users\\FlavioMueller\\git\\Hitit\\src\\hitit.png"));
+		shlchoose.addShellListener(new ShellAdapter() {
+			@Override
+			public void shellClosed(ShellEvent e) {
+				System.exit(0);
+			}
+		});
+		shlchoose.setImage(SWTResourceManager.getImage(Choose.class, "/img/hitit.png"));
 		shlchoose.setSize(450, 449);
-		shlchoose.setText("SWT Application");
+		shlchoose.setText("Hitit");
 
 		Label lblangeklickt = new Label(shlchoose, SWT.NONE);
 		lblangeklickt.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
@@ -174,12 +182,12 @@ public class Choose {
 				}
 
 				if (chosen != 10) {
-					Play.playsound("confirm.stargui");
 					MessageBox msgBox = new MessageBox(shlchoose);
 					msgBox.setText("Warning!");
 					msgBox.setMessage("Please choose 10 Boxes!");
 					msgBox.open();
 				} else {
+					Play.playsound("res/confirm.wav");
 					isvisible = false;
 					shlchoose.setVisible(false);
 					Main.windows.add(shlchoose);

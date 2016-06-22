@@ -51,20 +51,17 @@ public class Won {
 	 */
 	protected void createContents() {
 		
-		Play.playsound("won.wav");
+		Play.playsound("res/won.wav");
 		
 		shlwon = new Shell();
+		shlwon.setImage(SWTResourceManager.getImage(Won.class, "/img/hitit.png"));
 		shlwon.setSize(450, 300);
-		shlwon.setText("SWT Application");
+		shlwon.setText("Hitit");
 		
 		Label lblYouHaveWon = new Label(shlwon, SWT.NONE);
 		lblYouHaveWon.setText("You have won!");
 		lblYouHaveWon.setFont(SWTResourceManager.getFont("Segoe UI", 27, SWT.NORMAL));
 		lblYouHaveWon.setBounds(10, 10, 414, 75);
-		
-		Button button = new Button(shlwon, SWT.NONE);
-		button.setText("Back to the selection!");
-		button.setBounds(140, 226, 124, 25);
 		
 		Button button_1 = new Button(shlwon, SWT.NONE);
 		button_1.addSelectionListener(new SelectionAdapter() {

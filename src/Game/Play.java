@@ -6,20 +6,19 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 
 public class Play {
 
@@ -78,7 +77,7 @@ public class Play {
 
 			@Override
 			public void run() {
-				play("src/ingame.wav");
+				play("res/ingame.wav");
 			}
 
 			public void play(String filename) {
@@ -100,9 +99,15 @@ public class Play {
 		}, 0, 305_000);
 
 		shlplay = new Shell(SWT.CLOSE | SWT.MIN);
-		shlplay.setImage(SWTResourceManager.getImage("C:\\Users\\FlavioMueller\\git\\Hitit\\src\\hitit.png"));
+		shlplay.addShellListener(new ShellAdapter() {
+			@Override
+			public void shellClosed(ShellEvent e) {
+				System.exit(0);
+			}
+		});
+		shlplay.setImage(SWTResourceManager.getImage(Play.class, "/img/hitit.png"));
 		shlplay.setSize(900, 450);
-		shlplay.setText("SWT Application");
+		shlplay.setText("Hitit");
 
 		// set all the labels and stuff
 		Label lblYourField = new Label(shlplay, SWT.NONE);
@@ -241,21 +246,7 @@ public class Play {
 					}
 				}
 
-				if (active > 5) {
-					MsgBox("Warning", "Please choose max. 5 fields");
-					mtone = true;
-
-					int ausgewählt = 0;
-					for (int i = 0; i < 10; i++) {
-						for (int j = 0; j < 10; j++) {
-							if (playerhit[i][j].getSelection() && playerhit[i][j].getVisible()) {
-								ausgewählt++;
-							}
-						}
-					}
-					q = ausgewählt;
-
-				} else {
+				
 
 					for (int i = 0; i < 10; i++) {
 						for (int j = 0; j < 10; j++) {
@@ -265,7 +256,7 @@ public class Play {
 						}
 					}
 					
-					playsound("hit.wav");
+					playsound("res/hit.wav");
 
 					for (int p = 0; p < active; p++) {
 						int a = 0;
@@ -296,7 +287,7 @@ public class Play {
 						}
 					}
 
-				}
+				
 				// end playerpart
 
 				if (!mtone) {
@@ -373,13 +364,6 @@ public class Play {
 
 	}
 
-	private void MsgBox(String Text, String Message) {
-		MessageBox msgbox = new MessageBox(shlplay);
-		msgbox.setText(Text);
-		msgbox.setMessage(Message);
-		msgbox.open();
-	}
-
 	private void setCanvasgreen(int posx, int posy, int height, int width) {
 		Canvas canvasc = new Canvas(shlplay, SWT.NONE);
 		canvasc.setBounds(posx, posy, height, width);
@@ -397,9 +381,7 @@ public class Play {
 			public void run() {
 				try {
 					Clip clip = AudioSystem.getClip();
-					URL url = this.getClass().getClassLoader().getResource(path);
-					AudioInputStream inputStream = AudioSystem.getAudioInputStream(url);
-					clip.open(inputStream);
+					clip.open(AudioSystem.getAudioInputStream(new File(path)));
 					clip.start();
 				} catch (Exception e) {
 					e.printStackTrace();
